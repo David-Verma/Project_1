@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { login, me, register, resendVerification, verifyEmail } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
+const router = Router();
+const asyncHandler = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+router.post('/register', asyncHandler(register));
+router.post('/verify-email', asyncHandler(verifyEmail));
+router.post('/resend-verification', asyncHandler(resendVerification));
+router.post('/login', asyncHandler(login));
+router.get('/me', protect, me);
+export default router;

@@ -1,0 +1,7 @@
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import api, { errorText } from '../api/axios';
+import PostCard from '../components/PostCard';
+import { ErrorNotice, Loading } from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
+export default function Profile() { const { id } = useParams(); const { user } = useAuth(); const [data, setData] = useState(null); const [error, setError] = useState(''); useEffect(() => { api.get(`/users/${id}`).then(r => setData(r.data)).catch(e => setError(errorText(e))); }, [id]); if (error) return <ErrorNotice>{error}</ErrorNotice>; if (!data) return <Loading/>; return <section className="profile-page"><div className="profile-head"><div className="profile-avatar">{data.user.avatarUrl ? <img src={data.user.avatarUrl} alt=""/> : data.user.name[0]}</div><div><p className="eyebrow">Writer profile</p><h1>{data.user.name}</h1><p className="muted">{data.user.bio || 'Curious about how things work.'}</p></div>{user?._id === data.user._id && <Link to="/settings" className="button button-outline">Edit profile</Link>}</div><div className="section-heading"><div><p className="eyebrow">Published notes</p><h2>{data.posts.length} {data.posts.length === 1 ? 'story' : 'stories'}</h2></div></div>{data.posts.length ? <div className="post-list">{data.posts.map(p => <PostCard key={p._id} post={p}/>)}</div> : <div className="empty-state"><h3>No published stories yet</h3><p>When {data.user.name} shares something, it will appear here.</p></div>}</section>; }
